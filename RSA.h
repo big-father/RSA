@@ -14,29 +14,36 @@ private:
     int mod = 0;
     int p = 0;
     int q = 0;
+    int fi = 0;
 
-    string input_text;
-    string output_text;
-    string user;
+    string msg;
+    string user;            // creator (decryptor) or user (encryptor)
 
-    int get_sample_number();
-    int fun_e();
-    int get_fi();
-    bool is_semple_number(int x);
-    bool nod_is_one(int x, int y);
+    int get_prime();
+    int eulers(int p, int q);
+    bool is_prime(int x);
+    bool is_double_prime(int x, int y);
+    void set_d();
+    void make_fi();
 
 public:
 
+    enum users
+    {
+        USER = "user",
+        CREATOR = "creator"
+    };
+
     RSA(string user);
-    void set_mod(int n = 0);
     int get_mod();
-    void set_exp();
+    void set_mod(int n = 0);
     void get_exp();
-    void set_d();
-    void input_massege(string text);
-    string get_enctypt_massege();
-    void encrypting_message();
-    void diencrypting_message();
+    void set_exp(int n = 0);
+    
+    string get_massege();
+    void set_massege(string msg);
+    void encrypting();
+    void dencrypting();
 
 };
 

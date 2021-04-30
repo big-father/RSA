@@ -1,32 +1,37 @@
 #include "RSA.h"
 
-int RSA::get_sample_number()
+int RSA::get_prime()
 {
-    cout << "semple number is getting" << endl;
     return 0;
 }
 
-int RSA::fun_e()
+int RSA::eulers(int p, int q)
 {
-    cout << "fi is getting" << endl;
     return 0;
 }
 
-int RSA::get_fi()
-{
-    cout << "starting set_fi" << endl;
-    return 0;
-}
-
-bool RSA::is_semple_number(int x)
+bool RSA::is_prime(int x)
 {
     return false;
 }
 
-bool RSA::nod_is_one(int x, int y)
+bool RSA::is_double_prime(int x, int y)
 {
     return false;
 }
+
+void RSA::set_d()
+{
+    // use fi
+    d = 0;
+}
+
+void RSA::make_fi()
+{
+    fi = eulers(p, q);
+}
+
+
 
 
 
@@ -37,52 +42,68 @@ RSA::RSA(string user)
 {
     this->user = user;
 
-    cout << "constructor seted" << endl;
-}
-
-void RSA::set_mod(int n = 0)
-{
-    cout << "seted mod (q * p)" << endl;
+    if (user == CREATOR)
+    {
+        set_mod();
+        set_exp();
+        set_d();
+    }
 }
 
 int RSA::get_mod()
 {
-    cout << "geted mod (q * p)" << endl;
+    return mod;
 }
 
-void RSA::set_exp()
+void RSA::set_mod(int n = 0)
 {
-    cout << "key is setting" << endl;
+    if (n != 0)
+    {
+        exp = n;
+    }
+    else
+    {
+        // calculate mod
+        p = get_prime();
+        q = get_prime();
+        mod = q * p;
+    }
 }
 
 void RSA::get_exp()
 {
-    cout << "key is getting" << endl;
+    return exp;
 }
 
-void RSA::set_d()
+void RSA::set_exp(int n = 0)
 {
-    cout << "d is setting" << endl;
+    if (n != 0)
+    {
+        exp = n;
+    }
+    else
+    {
+        // calculate exp and use fi
+        make_fi();
+    }
 }
 
-void RSA::input_massege(string text)
+string RSA::get_massege()
 {
-    cout << "input message" << endl;
-    input_text = text;
+    return msg;
 }
 
-string RSA::get_enctypt_massege()
+void RSA::set_massege(string msg)
 {
-    cout << "get encrypt message" << endl;
-    return output_text;
+    this->msg = msg;
 }
 
-void RSA::encrypting_message()
+void RSA::encrypting()
 {
-    cout << "encrypted_message is making" << endl;
+    this->msg = "";
 }
 
-void RSA::diencrypting_message()
+void RSA::dencrypting()
 {
-    cout << "diencrypting message" << endl;
+    this->msg = "";
 }

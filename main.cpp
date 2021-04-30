@@ -1,29 +1,33 @@
 #include <iostream>
 #include <string>
+#include "RSA.h"
 using namespace std;
 
 int main(int argc, char* argv[])
 {
+    //--------------------------EXEMPLE--TO--USE---------------------------
+    /*
+    RSA creator(RSA::CREATOR);
+    RSA user(RSA::USER);
 
-    RSA adam("adam");
-    RSA eva("eva");
-
-    // set n
-    adam.set_mod(); eva.set_mod(adam.get_mod());
-
-    // set exp
-    adam.set_exp(); eva.set_exp();
-
-    // set d
-    adam.set_d();
+    user.set_exp(creator.get_exp());
+    user.set_mod(creator.get_mod());
 
     string msg;
+    cout << "enter your massege: " << endl;
+    cin >> msg;
 
-    eva.input_massege(msg);
-    eva.encrypting_message();
+    user.set_massege(msg);
+    user.encrypting();
 
-    adam.input_massege(eva.get_enctypt_massege());
-    adam.diencrypting_message();
+    cout << "encripteded massage: " << user.get_massege() << endl;
+
+    creator.set_massege(user.get_massege());
+    creator.dencrypting();
+
+    cout << "dencripteded massage: " << creator.get_massege() << endl;
+    */
+
 
     return 0;
 }
