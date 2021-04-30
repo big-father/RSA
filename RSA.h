@@ -12,6 +12,8 @@ private:
     int exp = 0;
     int d = 0;
     int mod = 0;
+    int p = 0;
+    int q = 0;
 
     string input_text;
     string output_text;
