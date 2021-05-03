@@ -1,42 +1,82 @@
 #include "RSA.h"
+#include "converter.h"
+#include <boost/integer/mod_inverse.hpp>
+#include <boost/math/special_functions/prime.hpp>
 
-int RSA::get_prime()
+using namespace boost::math;
+using namespace boost::multiprecision;
+
+cpp_int RSA::encrypt_block(const cpp_int& mes, cpp_int open_key, cpp_int open_e, cpp_int noise)
 {
-    return 0;
+    auto m(mes);
+    m ^= noise;
+
+    return powm(m, open_e, open_key);
 }
 
-int RSA::eulers(int p, int q)
+cpp_int RSA::decrypt_block(const cpp_int& crp, cpp_int open_key, cpp_int key, cpp_int noise)
 {
-    return 0;
+    cpp_int c = powm(crp, key, open_key);
+    c ^= noise;
+
+    return c;
 }
 
-bool RSA::is_prime(int x)
+cpp_int RSA::findE(const cpp_int& n)
 {
-    return false;
+    cpp_int e;
+        for ( unsigned i = 1; i < max_prime; i++ )
+        {
+            e = prime(i);
+            if (gcd(e, n) == 1 )
+            {
+                return e;
+            }
+        }
+
+        return cpp_int(-1);
 }
 
-bool RSA::is_double_prime(int x, int y)
+inline cpp_int RSA::findD(const cpp_int& e, const cpp_int& N)
 {
-    return false;
+    return boost::integer::mod_inverse(e, N);
 }
 
-void RSA::set_d()
+vector<cpp_int> RSA::encrypt(const std::string& mes)
 {
-    // use fi
-    d = 0;
+    if (key.open.n == 0)
+        return vector<cpp_int>();
+
+    vector<cpp_int> crp_blocks;
+    auto open_blocks = converter::string_to_blocks(mes);
+    auto crp_block = key.open.init_vec;
+    for (const auto& ob : open_blocks)
+    {
+        crp_block = encrypt_block(ob, key.open.n, key.open.exp , crp_block);
+        crp_blocks.push_back(crp_block);
+    }
+
+    return crp_blocks;
 }
 
-void RSA::make_fi()
+std::string RSA::dencrypt(const vector<cpp_int>& crp_blocks)
 {
-    fi = eulers(p, q);
+    if (key.key == 0)
+        return "";
+
+    string mes;
+    auto crp_block = key.open.init_vec;
+    for (const auto& cb : crp_blocks)
+    {
+        auto open_block = decrypt_block(cb, key.open.n, key.key, crp_block);
+        auto str = converter::block_to_string(open_block);
+        crp_block = cb;
+
+        mes += str;
+    }
+
+    return mes;
 }
-
-
-
-
-
-
-
 
 RSA::RSA(string user)
 {
@@ -50,60 +90,40 @@ RSA::RSA(string user)
     }
 }
 
-int RSA::get_mod()
+ostream& operator<<(ostream& os, const RSA::s_open_key& ok)
 {
-    return mod;
+    os << ok.exp << SPLITER
+       << converter::cpp_int_to_str64(ok.n) << SPLITER
+       << converter::cpp_int_to_str64(ok.init_vec) << SPLITER;
+
+    return os;
 }
 
-void RSA::set_mod(int n = 0)
+ostream& operator<<(ostream& os, const RSA::s_key& k)
 {
-    if (n != 0)
-    {
-        exp = n;
-    }
-    else
-    {
-        // calculate mod
-        p = get_prime();
-        q = get_prime();
-        mod = q * p;
-    }
+    os << k.open
+       << converter::cpp_int_to_str64(k.key) << SPLITER;
+
+    return os;
 }
 
-void RSA::get_exp()
+istream& operator>>(istream& is, RSA::s_open_key& ok)
 {
-    return exp;
+    string  str64_n, str64_init_vec;
+    is >> ok.exp >> str64_n >> str64_init_vec;
+
+    ok.exp = converter::str64_to_cpp_int(str64_n);
+    ok.exp = converter::str64_to_cpp_int(str64_init_vec);
+
+    return is;
 }
 
-void RSA::set_exp(int n = 0)
+istream& operator>>(istream& is, RSA::s_key& key)
 {
-    if (n != 0)
-    {
-        exp = n;
-    }
-    else
-    {
-        // calculate exp and use fi
-        make_fi();
-    }
-}
+    string str64_key;
+    is >> key.open >> str64_key;
 
-string RSA::get_massege()
-{
-    return msg;
-}
+    key.key = converter::str64_to_cpp_int(str64_key);
 
-void RSA::set_massege(string msg)
-{
-    this->msg = msg;
-}
-
-void RSA::encrypting()
-{
-    this->msg = "";
-}
-
-void RSA::dencrypting()
-{
-    this->msg = "";
+    return is;
 }
